@@ -1,4 +1,6 @@
 import dayjs from "dayjs";
+import { scheduleNew } from "../../services/schedule-new.js";
+import { schedulesDay } from "../schedules/load.js";
 
 const form = document.querySelector("form");
 const clientName = document.getElementById("client");
@@ -7,7 +9,7 @@ const selectedDate = document.getElementById("date");
 selectedDate.value = dayjs(new Date()).format("YYYY-MM-DD");
 selectedDate.min = dayjs(new Date()).format("YYYY-MM-DD");
 
-form.onsubmit = function (event) {
+form.onsubmit = async function (event) {
   event.preventDefault();
 
   try {
@@ -25,13 +27,15 @@ form.onsubmit = function (event) {
 
     const id = new Date().getTime();
 
-    console.log([
-      {
-        id,
-        name,
-        when,
-      },
-    ]);
+    await scheduleNew({
+      id,
+      name,
+      when,
+    });
+    
+    await schedulesDay();
+
+    clientName.value = "";
   } catch (error) {
     alert("Erro ao enviar formulário");
     console.log(error);
